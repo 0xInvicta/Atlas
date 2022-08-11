@@ -1,1 +1,1 @@
-# Atlas - A All In One Forensics Tool Kit
+# Atlas - An All In One Forensics Tool Kit
