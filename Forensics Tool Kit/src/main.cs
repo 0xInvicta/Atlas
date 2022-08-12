@@ -5,19 +5,34 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
+using static System.Net.WebRequestMethods;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
+
+
 
 namespace Forensics_Tool_Kit
 {
     internal class main
     {
+        [DllImport("user32.dll")]
+        public static extern int SetForegroundWindow(IntPtr hWnd);
+        [STAThread]
+
         static void Main(string[] args)
         {
             printTitle();
 
-            while (true)
+            bool EXIT_FLAG = false;
+
+            while (!EXIT_FLAG)
             {
-                mainMenu();
+                EXIT_FLAG = mainMenu();
             }
+            Environment.Exit(0);
+
+
         }
 
         public static void printTitle()
@@ -26,7 +41,7 @@ namespace Forensics_Tool_Kit
             Console.WriteLine("\r\n █████╗ ████████╗ █████╗ ██╗     ███████╗\r\n██╔══██╗╚══██╔══╝██╔══██╗██║     ██╔════╝\r\n███████║   ██║   ███████║██║     ███████╗\r\n██╔══██║   ██║   ██╔══██║██║     ╚════██║\r\n██║  ██║   ██║   ██║  ██║███████╗███████║\r\n╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚══════╝\r\n                                         \r");
             Console.WriteLine("A Forensics Tool Kit By Mateusz Peplinski \n");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            //showloadingPercent();
+            showloadingPercent();
             Console.Clear();
             resetTextColour();
         }
@@ -34,9 +49,9 @@ namespace Forensics_Tool_Kit
         {
             Console.WriteLine("\r\n╔═╗╔╦╗╔═╗╦  ╔═╗  ╔╦╗╔═╗╔╗╔╦ ╦\r\n╠═╣ ║ ╠═╣║  ╚═╗  ║║║║╣ ║║║║ ║\r\n╩ ╩ ╩ ╩ ╩╩═╝╚═╝  ╩ ╩╚═╝╝╚╝╚═╝\r");
         }
-        public static void mainMenu()
+        public static bool mainMenu()
         {
-            
+            bool EXIT_FLAG = false;
             Console.ForegroundColor = ConsoleColor.Green;
             printMenuTitle();
             printSplitLine();
@@ -59,15 +74,23 @@ namespace Forensics_Tool_Kit
             {
                 switch (selectedOption_INT)
                 {
-                    case 1:                                                   
+                    case 1:
+                        Console.Clear();
                         IPMenu();                      
                         break;
                     case 2:
+                        Console.Clear();
                         malwareMenu();
                         break;
                     case 3:
+                        Console.Clear();
                         break;
+                    case 4:
+                        Console.Clear();
+                        EXIT_FLAG = true;
+                        break ;
                     default:
+                        Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Invalid Option !");
                         Console.ForegroundColor = ConsoleColor.White;
@@ -81,7 +104,7 @@ namespace Forensics_Tool_Kit
                 Console.WriteLine("Enter A Valid Number !");
                 Console.ForegroundColor = ConsoleColor.White;
             }
-            
+            return EXIT_FLAG;
         }
 
         public static void IPMenu()
@@ -94,7 +117,7 @@ namespace Forensics_Tool_Kit
                 Console.ForegroundColor = ConsoleColor.Green;
 
                 printSplitLine();
-                Console.WriteLine(String.Format("{0,20}", "IP Address Menu"));
+                Console.WriteLine(String.Format("{0,20}", "IP Address Menu "));
                 printSplitLine();
                 Console.WriteLine(String.Format("[1] - {0,20}", "IP Address Gather All Information"));
                 Console.WriteLine(String.Format("[2] - {0,20}", "IP Address Ping Test"));
@@ -117,7 +140,8 @@ namespace Forensics_Tool_Kit
                     switch (selectedOption_INT)
                     {
                         case 1:
-                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Clear();
+                            Console.ForegroundColor = ConsoleColor.White;
                             Console.WriteLine("Enter a Vaild IP Address to Gather Intelligence");                    
                             Console.Write("> ");
                             Console.ForegroundColor = ConsoleColor.Blue;
@@ -129,11 +153,18 @@ namespace Forensics_Tool_Kit
 
                             if (pingStatus == true)
                             {
-                                Console.Write("Ping Status: ");
                                 Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("SUCCESS");
-                                Console.WriteLine("Staring Intelligence Gathering...");
+                                Console.WriteLine("---------------------");
                                 Console.ForegroundColor = ConsoleColor.White;
+                                Console.Write("Ping Status: ");
+                                Console.ForegroundColor = ConsoleColor.Green;                            
+                                Console.WriteLine("SUCCESS|");
+                                Console.WriteLine("---------------------");
+                                Console.WriteLine("Staring Intelligence Gathering...");
+                                Console.WriteLine("---------------------");
+                                getIPLocation(IPAddr);                              
+                                Console.ForegroundColor = ConsoleColor.White;
+                                break;
                             }
 
                             else
@@ -144,12 +175,47 @@ namespace Forensics_Tool_Kit
                                 Console.WriteLine("Failed to Ping Unable to Complete Scan");
                                 Console.ForegroundColor = ConsoleColor.White;
                             }
-
-                            
                             break;
 
                         case 2:
+                            Console.Clear();
                             tryPing();
+                            break;
+
+                        case 3:
+                            Console.Clear();
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.WriteLine("Enter a Vaild IP Address to Find The Location ");
+                            Console.Write("> ");
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            String IPAddrLoc = Console.ReadLine();
+
+                            bool pingStatusLoc = ping(IPAddrLoc);
+                            Console.ForegroundColor = ConsoleColor.White;
+
+                            if (pingStatusLoc == true)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("---------------------");
+                                Console.ForegroundColor = ConsoleColor.White;
+                                Console.Write("Ping Status: ");
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("SUCCESS|");
+                                Console.WriteLine("---------------------");
+                                Console.WriteLine("Staring Intelligence Gathering...");
+                                Console.WriteLine("---------------------");
+                                getIPLocation(IPAddrLoc);
+                                Console.ForegroundColor = ConsoleColor.White;
+                                break;
+                            }
+                            else
+                            {
+                                Console.ForegroundColor = ConsoleColor.White;
+                                Console.Write("Ping Status: ");
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Failed to Ping Unable to Complete Scan");
+                                Console.ForegroundColor = ConsoleColor.White;
+                            }
                             break;
 
                         case 6:
@@ -181,6 +247,38 @@ namespace Forensics_Tool_Kit
 
         }
 
+        public static void getIPLocation(String IPAddr)
+        {
+
+            var Ip_Api_Url = "http://ip-api.com/json/" + IPAddr;
+            // IP API URL
+            //var Ip_Api_Url = "http://ip-api.com/json/79.115.169.156"; // 206.189.139.232 - This is a sample IP address. You can pass yours if you want to test          
+
+            // Use HttpClient to get the details from the Json response
+            using (HttpClient httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                // Pass API address to get the Geolocation details 
+                httpClient.BaseAddress = new Uri(Ip_Api_Url);
+                HttpResponseMessage httpResponse = httpClient.GetAsync(Ip_Api_Url).GetAwaiter().GetResult();
+                // If API is success and receive the response, then get the location details
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var geolocationInfo = httpResponse.Content.ReadAsAsync<LocationDetails_IpApi>().GetAwaiter().GetResult();
+                    if (geolocationInfo != null)
+                    {
+                        Console.WriteLine("Country: " + geolocationInfo.country);
+                        Console.WriteLine("Region: " + geolocationInfo.regionName);
+                        Console.WriteLine("City: " + geolocationInfo.city);
+                        Console.WriteLine("Zip: " + geolocationInfo.zip);
+                        Console.WriteLine("---------------------");
+                        Console.WriteLine("Press Any Key to exit");
+                        Console.ReadKey();
+                    }
+                }
+            }
+        }
         public static void tryPing()
         {
             Console.WriteLine("    - Ping -");
@@ -263,5 +361,22 @@ namespace Forensics_Tool_Kit
         {
             Console.ResetColor();
         }
+    }
+
+    public class LocationDetails_IpApi
+    {
+        public string query { get; set; }
+        public string city { get; set; }
+        public string country { get; set; }
+        public string countryCode { get; set; }
+        public string isp { get; set; }
+        public double lat { get; set; }
+        public double lon { get; set; }
+        public string org { get; set; }
+        public string region { get; set; }
+        public string regionName { get; set; }
+        public string status { get; set; }
+        public string timezone { get; set; }
+        public string zip { get; set; }
     }
 }
