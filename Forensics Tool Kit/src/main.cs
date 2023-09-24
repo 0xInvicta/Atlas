@@ -288,7 +288,7 @@ namespace Forensics_Tool_Kit
                     switch (selectedOption_INT)
                     {
                         case 1:
-                            var client = new RestClient("https://www.virustotal.com/vtapi/v2/ip-address/report?apikey=827c33c1a234a6630f25e092d51e3a0398b772c5b2393f1d199449c09d95e6ec&ip=" + "8.8.8.8");
+                            var client = new RestClient("https://www.virustotal.com/vtapi/v2/ip-address/report?apikey={KEY}" + "8.8.8.8");
                             var request = new RestRequest(Method.Get);
                             request.AddHeader("Accept", "application/json");
                             var response = client.Execute(request);
